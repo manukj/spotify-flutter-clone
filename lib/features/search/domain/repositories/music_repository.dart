@@ -1,7 +1,7 @@
-import '../entities/album.dart';
-import '../entities/artist.dart';
+import 'package:spotify_flutter/features/search/domain/entities/albums_response.dart';
+import 'package:spotify_flutter/features/search/domain/entities/artists_response.dart';
 
 abstract class MusicRepository {
-  Future<List<Artist>> searchArtists(String query);
-  Future<List<Album>> searchAlbums(String query);
+  Future<ArtistsResponse> searchArtists(String query);
+  Future<AlbumsResponse> searchAlbums(String query);
 } 

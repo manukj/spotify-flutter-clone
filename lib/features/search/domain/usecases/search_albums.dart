@@ -1,4 +1,4 @@
-import '../entities/album.dart';
+import '../entities/albums_response.dart';
 import '../repositories/music_repository.dart';
 
 class SearchAlbums {
@@ -6,7 +6,7 @@ class SearchAlbums {
 
   SearchAlbums(this.repository);
 
-  Future<List<Album>> call(String query) {
+  Future<AlbumsResponse> call(String query) {
     return repository.searchAlbums(query);
   }
 } 
