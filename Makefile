@@ -16,3 +16,20 @@ clean:
 
 .PHONY: clean_n_build
 clean_n_build: clean flutter_pub_get build_runner
+
+.PHONY: test test-watch coverage
+
+test:
+	flutter test
+
+test-watch:
+	flutter test --watch
+
+coverage:
+	flutter test --coverage
+	genhtml coverage/lcov.info -o coverage/html
+	open coverage/html/index.html
+
+clean:
+	flutter clean
+	rm -rf coverage

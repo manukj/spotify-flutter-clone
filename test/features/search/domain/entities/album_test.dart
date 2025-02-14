@@ -55,7 +55,7 @@ void main() {
 
     expect(album.albumType, 'album');
     expect(album.totalTracks, 9);
-    expect(album.availableMarkets.length, 100);
+    expect(album.availableMarkets.length, 169);
     expect(album.externalUrls?.spotify, 'https://open.spotify.com/album/28IDISyL4r5E5PXP0aQMnl');
     expect(album.href, 'https://api.spotify.com/v1/albums/28IDISyL4r5E5PXP0aQMnl');
     expect(album.id, '28IDISyL4r5E5PXP0aQMnl');
