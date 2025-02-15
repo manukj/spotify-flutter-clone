@@ -15,12 +15,14 @@ ArtistModel _$ArtistModelFromJson(Map<String, dynamic> json) => ArtistModel(
               json['externalUrls'] as Map<String, dynamic>),
       href: json['href'] as String,
       uri: json['uri'] as String,
-      popularity: (json['popularity'] as num).toInt(),
+      popularity: (json['popularity'] as num?)?.toInt(),
       followers: json['followers'] == null
           ? null
           : FollowersModel.fromJson(json['followers'] as Map<String, dynamic>),
-      genres:
-          (json['genres'] as List<dynamic>).map((e) => e as String).toList(),
+      genres: (json['genres'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
       images: (json['images'] as List<dynamic>?)
           ?.map((e) => ImageModel.fromJson(e as Map<String, dynamic>))
           .toList(),

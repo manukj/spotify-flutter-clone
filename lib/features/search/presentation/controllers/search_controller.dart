@@ -23,7 +23,7 @@ class SearchController extends GetxController {
   final artistsResponse = Rxn<ArtistsResponse>();
   final albumsResponse = Rxn<AlbumsResponse>();
   final error = Rxn<String>();
-  final isArtistSelected = false.obs;
+  final isArtistSelected = true.obs;
   final isAlbumSelected = false.obs;
 
   @override
@@ -38,11 +38,11 @@ class SearchController extends GetxController {
       clearSearch();
       return;
     }
-    
+
     error.value = null;
     query.value = searchQuery;
     isLoading.value = true;
-    
+
     _debouncer.run(() => _search(searchQuery));
   }
 
@@ -83,8 +83,18 @@ class SearchController extends GetxController {
     artistsResponse.value = null;
     albumsResponse.value = null;
     error.value = null;
-    isArtistSelected.value = false;
+    isArtistSelected.value = true;
     isAlbumSelected.value = false;
     isLoading.value = false;
+  }
+
+  void selectAlbum() {
+    isAlbumSelected.value = true;
+    isArtistSelected.value = false;
+  }
+
+  void selectArtist() {
+    isArtistSelected.value = true;
+    isAlbumSelected.value = false;
   }
 }

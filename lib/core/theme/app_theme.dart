@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   static const Color spotifyGreen = Color(0xFF1DB954);
-  static const Color darkBackground = Color(0xFF191414);
-  static const Color darkSurface = Color(0xFF121212);
+  static const Color darkBackground = Color.fromARGB(255, 8, 8, 8);
+  static const Color darkSurface = Color.fromARGB(255, 0, 0, 0);
   static const Color darkPrimaryText = Colors.white;
   static const Color darkSecondaryText = Colors.grey;
 

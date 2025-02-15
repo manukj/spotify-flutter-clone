@@ -8,7 +8,7 @@ class Artist {
   final ExternalUrls? externalUrls;
   final String href;
   final String uri;
-  final int popularity;
+  final int? popularity;
   final Followers? followers;
   final List<String> genres;
   final List<Image>? images;
@@ -19,7 +19,7 @@ class Artist {
     required this.externalUrls,
     required this.href,
     required this.uri,
-    required this.popularity,
+     this.popularity,
     required this.followers,
     required this.genres,
     required this.images,

@@ -14,8 +14,9 @@ class ArtistModel {
   final ExternalUrlsModel? externalUrls;
   final String href;
   final String uri;
-  final int popularity;
+  final int? popularity;
   final FollowersModel? followers;
+  @JsonKey(defaultValue: <String>[])
   final List<String> genres;
   final List<ImageModel>? images;
 
@@ -25,13 +26,14 @@ class ArtistModel {
     this.externalUrls,
     required this.href,
     required this.uri,
-    required this.popularity,
+    this.popularity,
     this.followers,
-    required this.genres,
+    this.genres = const [],
     this.images,
   });
 
-  factory ArtistModel.fromJson(Map<String, dynamic> json) => _$ArtistModelFromJson(json);
+  factory ArtistModel.fromJson(Map<String, dynamic> json) =>
+      _$ArtistModelFromJson(json);
   Map<String, dynamic> toJson() => _$ArtistModelToJson(this);
 
   Artist toEntity() => Artist(
@@ -49,11 +51,15 @@ class ArtistModel {
   factory ArtistModel.fromEntity(Artist entity) => ArtistModel(
         id: entity.id,
         name: entity.name,
-        externalUrls: entity.externalUrls != null ? ExternalUrlsModel.fromEntity(entity.externalUrls!) : null,
+        externalUrls: entity.externalUrls != null
+            ? ExternalUrlsModel.fromEntity(entity.externalUrls!)
+            : null,
         href: entity.href,
         uri: entity.uri,
         popularity: entity.popularity,
-        followers: entity.followers != null ? FollowersModel.fromEntity(entity.followers!) : null,
+        followers: entity.followers != null
+            ? FollowersModel.fromEntity(entity.followers!)
+            : null,
         genres: entity.genres,
         images: entity.images?.map((e) => ImageModel.fromEntity(e)).toList(),
       );
