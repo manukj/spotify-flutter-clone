@@ -17,7 +17,7 @@ class Album {
   final String uri;
   final List<Artist> artists;
 
-  Album({
+  const Album({
     required this.albumType,
     required this.totalTracks,
     required this.availableMarkets,
@@ -32,4 +32,36 @@ class Album {
     required this.uri,
     required this.artists,
   });
-} 
+
+  Album copyWith({
+    String? albumType,
+    int? totalTracks,
+    List<String>? availableMarkets,
+    ExternalUrls? externalUrls,
+    String? href,
+    String? id,
+    List<Image>? images,
+    String? name,
+    String? releaseDate,
+    String? releaseDatePrecision,
+    String? type,
+    String? uri,
+    List<Artist>? artists,
+  }) {
+    return Album(
+      albumType: albumType ?? this.albumType,
+      totalTracks: totalTracks ?? this.totalTracks,
+      availableMarkets: availableMarkets ?? this.availableMarkets,
+      externalUrls: externalUrls ?? this.externalUrls,
+      href: href ?? this.href,
+      id: id ?? this.id,
+      images: images ?? this.images,
+      name: name ?? this.name,
+      releaseDate: releaseDate ?? this.releaseDate,
+      releaseDatePrecision: releaseDatePrecision ?? this.releaseDatePrecision,
+      type: type ?? this.type,
+      uri: uri ?? this.uri,
+      artists: artists ?? this.artists,
+    );
+  }
+}
