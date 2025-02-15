@@ -11,7 +11,8 @@ class ArtistList extends GetView<spotify.SearchController> {
   Widget build(BuildContext context) {
     return Obx(() {
       final showArtists = controller.isArtistSelected.value &&
-          controller.artistsResponse.value?.items.isNotEmpty == true;
+          controller.artistsResponse.value?.items.isNotEmpty == true &&
+          !controller.isLoading.value;
 
       if (!showArtists) {
         return const SizedBox.shrink();

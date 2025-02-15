@@ -40,7 +40,7 @@ class InfoAndLoader extends GetView<spotify.SearchController> {
   }
 
   Widget _buildEmptySearchState() {
-    final searchType = controller.isArtistSelected.value ? 'artists' : 'albums';
+    final searchType = controller.isArtistSelected.value ? 'Artists' : 'Albums';
     return Expanded(
       child: SizedBox(
         width: double.infinity,

@@ -11,7 +11,8 @@ class AlbumList extends GetView<spotify.SearchController> {
   Widget build(BuildContext context) {
     return Obx(() {
       final showAlbums = controller.isAlbumSelected.value &&
-          controller.albumsResponse.value?.items.isNotEmpty == true;
+          controller.albumsResponse.value?.items.isNotEmpty == true &&
+          !controller.isLoading.value;
 
       if (!showAlbums) {
         return const SizedBox.shrink();
