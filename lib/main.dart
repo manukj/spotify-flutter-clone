@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 import 'core/config/env_config.dart';
 import 'core/di/injection_container.dart';
@@ -8,6 +9,7 @@ import 'features/search/presentation/pages/home_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await GetStorage.init();
   await EnvConfig.load();
 
   if (!EnvConfig.isValid) {

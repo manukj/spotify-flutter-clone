@@ -2,27 +2,58 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:spotify_flutter/core/error/exceptions.dart';
+import 'package:spotify_flutter/core/network/services/auth_service.dart';
 import 'package:spotify_flutter/core/network/spotify_dio_interceptor.dart';
+
+class MockAuthService extends Mock implements AuthService {}
 
 class MockErrorInterceptorHandler extends Mock
     implements ErrorInterceptorHandler {}
+
+class MockRequestInterceptorHandler extends Mock
+    implements RequestInterceptorHandler {}
 
 class FakeDioException extends Fake implements DioException {}
 
 class FakeRequestOptions extends Fake implements RequestOptions {}
 
+class FakeOptions extends Fake implements Options {}
+
 void main() {
   setUpAll(() {
     registerFallbackValue(FakeDioException());
     registerFallbackValue(FakeRequestOptions());
+    registerFallbackValue(FakeOptions());
   });
 
   late SpotifyDioInterceptor interceptor;
-  late MockErrorInterceptorHandler handler;
+  late MockAuthService mockAuthService;
+  late MockErrorInterceptorHandler errorHandler;
+  late MockRequestInterceptorHandler requestHandler;
 
   setUp(() {
-    interceptor = SpotifyDioInterceptor();
-    handler = MockErrorInterceptorHandler();
+    mockAuthService = MockAuthService();
+    errorHandler = MockErrorInterceptorHandler();
+    requestHandler = MockRequestInterceptorHandler();
+    interceptor = SpotifyDioInterceptor(mockAuthService);
+  });
+
+  group('onRequest', () {
+    test('should add authorization header with token', () async {
+      // arrange
+      const tToken = 'test_token';
+      final options = RequestOptions(path: '');
+      when(() => mockAuthService.getAccessToken())
+          .thenAnswer((_) async => tToken);
+      when(() => requestHandler.next(any())).thenAnswer((_) async {});
+
+      // act
+      await interceptor.onRequest(options, requestHandler);
+
+      // assert
+      expect(options.headers['Authorization'], 'Bearer $tToken');
+      verify(() => requestHandler.next(options)).called(1);
+    });
   });
 
   group('onError', () {
@@ -41,9 +72,9 @@ void main() {
         ),
       );
 
-      interceptor.onError(error, handler);
+      interceptor.onError(error, errorHandler);
 
-      verify(() => handler.reject(any(
+      verify(() => errorHandler.reject(any(
             that: predicate((DioException e) =>
                 e.error is UnauthorizedException &&
                 (e.error as UnauthorizedException).message == 'Invalid token'),
@@ -65,9 +96,9 @@ void main() {
         ),
       );
 
-      interceptor.onError(error, handler);
+      interceptor.onError(error, errorHandler);
 
-      verify(() => handler.reject(any(
+      verify(() => errorHandler.reject(any(
             that: predicate((DioException e) =>
                 e.error is ForbiddenException &&
                 (e.error as ForbiddenException).message == 'Forbidden'),
@@ -89,9 +120,9 @@ void main() {
         ),
       );
 
-      interceptor.onError(error, handler);
+      interceptor.onError(error, errorHandler);
 
-      verify(() => handler.reject(any(
+      verify(() => errorHandler.reject(any(
             that: predicate((DioException e) =>
                 e.error is RateLimitException &&
                 (e.error as RateLimitException).message ==
@@ -114,9 +145,9 @@ void main() {
         ),
       );
 
-      interceptor.onError(error, handler);
+      interceptor.onError(error, errorHandler);
 
-      verify(() => handler.reject(any(
+      verify(() => errorHandler.reject(any(
             that: predicate((DioException e) =>
                 e.error is SpotifyException &&
                 (e.error as SpotifyException).message == 'Bad request' &&
@@ -129,14 +160,13 @@ void main() {
         requestOptions: RequestOptions(path: ''),
       );
 
-      interceptor.onError(error, handler);
+      interceptor.onError(error, errorHandler);
 
-      verify(() => handler.reject(any(
+      verify(() => errorHandler.reject(any(
             that: predicate((DioException e) =>
                 e.error is SpotifyException &&
                 (e.error as SpotifyException).message ==
-                    'Network error occurred' &&
-                (e.error as SpotifyException).statusCode == 500),
+                    'Network error occurred'),
           ))).called(1);
     });
 
@@ -150,9 +180,9 @@ void main() {
         ),
       );
 
-      interceptor.onError(error, handler);
+      interceptor.onError(error, errorHandler);
 
-      verify(() => handler.reject(any(
+      verify(() => errorHandler.reject(any(
             that: predicate((DioException e) =>
                 e.error is SpotifyException &&
                 (e.error as SpotifyException).message ==

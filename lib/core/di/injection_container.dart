@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 
 import '../../features/search/data/datasources/search_remote_data_source.dart';
 import '../../features/search/data/datasources/search_remote_data_source_impl.dart';
@@ -8,11 +9,16 @@ import '../../features/search/domain/repositories/music_repository.dart';
 import '../../features/search/domain/usecases/search_albums.dart';
 import '../../features/search/domain/usecases/search_artists.dart';
 import '../../features/search/presentation/controllers/search_controller.dart';
+import '../network/services/auth_service.dart';
 import '../network/spotify_dio_interceptor.dart';
 
 class DependencyInjection extends Bindings {
   @override
   void dependencies() {
+    Get.put(GetStorage());
+    
+    // Services
+    Get.lazyPut(() => AuthService(), fenix: true);
     
     Get.lazyPut<Dio>(
       () {
@@ -24,7 +30,7 @@ class DependencyInjection extends Bindings {
             },
           ),
         );
-        dio.interceptors.add(SpotifyDioInterceptor());
+        dio.interceptors.add(SpotifyDioInterceptor(Get.find<AuthService>()));
         return dio;
       },
       fenix: true,

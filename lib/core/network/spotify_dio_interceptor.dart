@@ -1,9 +1,24 @@
 import 'package:dio/dio.dart';
 
-import '../../features/search/data/models/spotify_error_response.dart';
 import '../error/exceptions.dart';
+import 'models/spotify_error_response.dart';
+import 'services/auth_service.dart';
 
 class SpotifyDioInterceptor extends Interceptor {
+  final AuthService _authService;
+
+  SpotifyDioInterceptor(this._authService);
+
+  @override
+  Future<void> onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
+    final token = await _authService.getAccessToken();
+    options.headers['Authorization'] = 'Bearer $token';
+    handler.next(options);
+  }
+
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     if (err.response != null) {
