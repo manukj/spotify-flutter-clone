@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../../core/utils/debouncer.dart';
@@ -10,6 +11,7 @@ class SearchController extends GetxController {
   final SearchArtists searchArtists;
   final SearchAlbums searchAlbums;
   final _debouncer = Debouncer();
+  final searchController = TextEditingController();
 
   SearchController({
     required this.searchArtists,
@@ -27,7 +29,21 @@ class SearchController extends GetxController {
   @override
   void onClose() {
     _debouncer.dispose();
+    searchController.dispose();
     super.onClose();
+  }
+
+  void onSearchQueryChanged(String searchQuery) {
+    if (searchQuery.isEmpty) {
+      clearSearch();
+      return;
+    }
+    
+    error.value = null;
+    query.value = searchQuery;
+    isLoading.value = true;
+    
+    _debouncer.run(() => _search(searchQuery));
   }
 
   Future<void> _search(String searchQuery) async {
@@ -60,21 +76,9 @@ class SearchController extends GetxController {
     }
   }
 
-  void onSearchQueryChanged(String searchQuery) {
-    if (searchQuery.isEmpty) {
-      clearSearch();
-      return;
-    }
-    
-    error.value = null;
-    query.value = searchQuery;
-    isLoading.value = true;
-    
-    _debouncer.run(() => _search(searchQuery));
-  }
-
   void clearSearch() {
     _debouncer.dispose();
+    searchController.clear();
     query.value = '';
     artistsResponse.value = null;
     albumsResponse.value = null;
