@@ -18,6 +18,7 @@ class AlbumList extends GetView<spotify.SearchController> {
       }
       return Expanded(
         child: GridView.builder(
+          physics: const NeverScrollableScrollPhysics(),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 2,
             childAspectRatio: 0.8,
