@@ -50,27 +50,18 @@ class SearchController extends GetxController {
     if (searchQuery.isEmpty) return;
 
     try {
-      if (!isArtistSelected.value && !isAlbumSelected.value) {
-        final results = await Future.wait([
-          searchArtists(searchQuery),
-          searchAlbums(searchQuery),
-        ]);
-        artistsResponse.value = results[0] as ArtistsResponse;
-        albumsResponse.value = results[1] as AlbumsResponse;
-      } else {
-        if (isArtistSelected.value) {
-          artistsResponse.value = await searchArtists(searchQuery);
-          albumsResponse.value = null;
-        }
-        if (isAlbumSelected.value) {
-          albumsResponse.value = await searchAlbums(searchQuery);
-          artistsResponse.value = null;
-        }
+      if (isArtistSelected.value) {
+        artistsResponse.value = await searchArtists(searchQuery);
+      } else if (isAlbumSelected.value) {
+        albumsResponse.value = await searchAlbums(searchQuery);
       }
     } catch (e) {
       error.value = e.toString();
-      artistsResponse.value = null;
-      albumsResponse.value = null;
+      if (isArtistSelected.value) {
+        artistsResponse.value = null;
+      } else if (isAlbumSelected.value) {
+        albumsResponse.value = null;
+      }
     } finally {
       isLoading.value = false;
     }
@@ -89,12 +80,28 @@ class SearchController extends GetxController {
   }
 
   void selectAlbum() {
+    if (isAlbumSelected.value) return;
     isAlbumSelected.value = true;
     isArtistSelected.value = false;
+    if (query.value.isNotEmpty &&
+        albumsResponse.value?.items.isEmpty != false) {
+      _refreshSearchIfNeeded();
+    }
   }
 
   void selectArtist() {
+    if (isArtistSelected.value) return;
     isArtistSelected.value = true;
     isAlbumSelected.value = false;
+    if (query.value.isNotEmpty &&
+        artistsResponse.value?.items.isEmpty != false) {
+      _refreshSearchIfNeeded();
+    }
+  }
+
+  void _refreshSearchIfNeeded() {
+    isLoading.value = true;
+    error.value = null;
+    _search(query.value);
   }
 }

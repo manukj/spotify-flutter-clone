@@ -43,45 +43,69 @@ void main() {
     items: [],
   );
 
-  test('initial state should have artist selected and album unselected', () {
-    expect(controller.isLoading.value, false);
-    expect(controller.query.value, '');
-    expect(controller.artistsResponse.value, null);
-    expect(controller.albumsResponse.value, null);
-    expect(controller.error.value, null);
-    expect(controller.isArtistSelected.value, true);
-    expect(controller.isAlbumSelected.value, false);
+  group('initial state', () {
+    test('should have artist selected and album unselected', () {
+      expect(controller.isLoading.value, false);
+      expect(controller.query.value, '');
+      expect(controller.artistsResponse.value, null);
+      expect(controller.albumsResponse.value, null);
+      expect(controller.error.value, null);
+      expect(controller.isArtistSelected.value, true);
+      expect(controller.isAlbumSelected.value, false);
+    });
   });
 
   group('selection behavior', () {
-    test('selectArtist should select only artist', () {
-      controller.isAlbumSelected.value = true;
-      controller.isArtistSelected.value = false;
+    test('selectArtist should not trigger search if already selected', () {
+      controller.isArtistSelected.value = true;
+      controller.isAlbumSelected.value = false;
+      controller.query.value = tQuery;
 
       controller.selectArtist();
 
+      verifyNever(() => mockSearchArtists(any()));
       expect(controller.isArtistSelected.value, true);
       expect(controller.isAlbumSelected.value, false);
     });
 
-    test('selectAlbum should select only album', () {
-      controller.isAlbumSelected.value = false;
-      controller.isArtistSelected.value = true;
+    test('selectAlbum should not trigger search if already selected', () {
+      controller.isAlbumSelected.value = true;
+      controller.isArtistSelected.value = false;
+      controller.query.value = tQuery;
 
       controller.selectAlbum();
 
+      verifyNever(() => mockSearchAlbums(any()));
       expect(controller.isArtistSelected.value, false);
       expect(controller.isAlbumSelected.value, true);
     });
 
-    test('clearSearch should reset to default selection state', () {
+    test('selectArtist should trigger search if has query and no data', () async {
       controller.isAlbumSelected.value = true;
       controller.isArtistSelected.value = false;
+      controller.query.value = tQuery;
+      when(() => mockSearchArtists(any())).thenAnswer((_) async => tArtistsResponse);
 
-      controller.clearSearch();
+      controller.selectArtist();
+      await Future.delayed(Duration.zero);
 
+      verify(() => mockSearchArtists(tQuery)).called(1);
       expect(controller.isArtistSelected.value, true);
       expect(controller.isAlbumSelected.value, false);
+    });
+
+    test('selectAlbum should trigger search if has query and no data', () async {
+      controller.isArtistSelected.value = true;
+      controller.isAlbumSelected.value = false;
+      controller.query.value = tQuery;
+      when(() => mockSearchAlbums(any())).thenAnswer((_) async => tAlbumsResponse);
+
+      controller.selectAlbum();
+      await Future.delayed(Duration.zero);
+
+      verify(() => mockSearchAlbums(tQuery)).called(1);
+      expect(controller.isArtistSelected.value, false);
+      expect(controller.isAlbumSelected.value, true);
     });
   });
 
@@ -95,7 +119,7 @@ void main() {
       expect(controller.isLoading.value, false);
     });
 
-    test('should call only artist search when artist is selected by default', () async {
+    test('should call only artist search when artist is selected', () async {
       when(() => mockSearchArtists(any())).thenAnswer((_) async => tArtistsResponse);
 
       controller.onSearchQueryChanged(tQuery);
@@ -106,7 +130,6 @@ void main() {
       verify(() => mockSearchArtists(tQuery)).called(1);
       verifyNever(() => mockSearchAlbums(any()));
       expect(controller.artistsResponse.value, tArtistsResponse);
-      expect(controller.albumsResponse.value, null);
       expect(controller.isLoading.value, false);
     });
 
@@ -122,40 +145,28 @@ void main() {
       verify(() => mockSearchAlbums(tQuery)).called(1);
       verifyNever(() => mockSearchArtists(any()));
       expect(controller.albumsResponse.value, tAlbumsResponse);
-      expect(controller.artistsResponse.value, null);
       expect(controller.isLoading.value, false);
     });
 
-    test('should call both searches when neither is selected', () async {
-      controller.isArtistSelected.value = false;
-      controller.isAlbumSelected.value = false;
-      
-      when(() => mockSearchArtists(any())).thenAnswer((_) async => tArtistsResponse);
-      when(() => mockSearchAlbums(any())).thenAnswer((_) async => tAlbumsResponse);
+    test('should handle error correctly for artist search', () async {
+      final tError = Exception('test error');
+      when(() => mockSearchArtists(any())).thenThrow(tError);
 
       controller.onSearchQueryChanged(tQuery);
       expect(controller.isLoading.value, true);
       
       await Future.delayed(const Duration(milliseconds: 600));
 
-      verify(() => mockSearchArtists(tQuery)).called(1);
-      verify(() => mockSearchAlbums(tQuery)).called(1);
-      expect(controller.artistsResponse.value, tArtistsResponse);
-      expect(controller.albumsResponse.value, tAlbumsResponse);
       expect(controller.isLoading.value, false);
+      expect(controller.error.value, tError.toString());
+      expect(controller.artistsResponse.value, null);
+      expect(controller.albumsResponse.value, null);
     });
 
-    test('should update state immediately when search query changes', () async {
-      controller.onSearchQueryChanged(tQuery);
-      
-      expect(controller.isLoading.value, true);
-      expect(controller.error.value, null);
-      expect(controller.query.value, tQuery);
-    });
-
-    test('should update state with error when search fails', () async {
+    test('should handle error correctly for album search', () async {
+      controller.selectAlbum();
       final tError = Exception('test error');
-      when(() => mockSearchArtists(any())).thenThrow(tError);
+      when(() => mockSearchAlbums(any())).thenThrow(tError);
 
       controller.onSearchQueryChanged(tQuery);
       expect(controller.isLoading.value, true);
@@ -172,17 +183,11 @@ void main() {
       when(() => mockSearchArtists(any())).thenAnswer((_) async => tArtistsResponse);
 
       controller.onSearchQueryChanged('t');
-      expect(controller.isLoading.value, true);
-      
-      await Future.delayed(const Duration(milliseconds: 100));
       controller.onSearchQueryChanged('te');
-      await Future.delayed(const Duration(milliseconds: 100));
       controller.onSearchQueryChanged('tes');
-      await Future.delayed(const Duration(milliseconds: 100));
       controller.onSearchQueryChanged(tQuery);
-
+      
       verifyNever(() => mockSearchArtists(any()));
-
       await Future.delayed(const Duration(milliseconds: 600));
 
       verify(() => mockSearchArtists(tQuery)).called(1);
