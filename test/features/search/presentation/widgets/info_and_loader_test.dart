@@ -39,9 +39,10 @@ void main() {
     return MaterialApp(
       theme: ThemeData.dark(),
       home: Scaffold(
-        body: SizedBox(
-          height: 600,
-          child: InfoAndLoader(),
+        body: Column(
+          children: [
+            InfoAndLoader(),
+          ],
         ),
       ),
     );

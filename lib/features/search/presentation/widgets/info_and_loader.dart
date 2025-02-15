@@ -10,8 +10,10 @@ class InfoAndLoader extends GetView<spotify.SearchController> {
   Widget build(BuildContext context) {
     return Obx(() {
       if (controller.isLoading.value) {
-        return const Center(
-          child: CircularProgressIndicator(),
+        return Expanded(
+          child: const Center(
+            child: CircularProgressIndicator(),
+          ),
         );
       }
 
@@ -39,85 +41,88 @@ class InfoAndLoader extends GetView<spotify.SearchController> {
 
   Widget _buildEmptySearchState() {
     final searchType = controller.isArtistSelected.value ? 'artists' : 'albums';
-    return SizedBox(
-      width: double.infinity,
-      height: double.infinity,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Search',
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.w700,
-              color: Colors.white.withAlpha(204),
+    return Expanded(
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Search',
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.w700,
+                color: Colors.white.withAlpha(204),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            searchType,
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.white.withAlpha(153),
+            const SizedBox(height: 8),
+            Text(
+              searchType,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.white.withAlpha(153),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildNoResultsState(String type) {
-    return SizedBox(
-      width: double.infinity,
-      height: double.infinity,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Couldn\'t find "$type"',
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.w700,
-              color: Colors.white.withAlpha(204),
+    return Expanded(
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Couldn\'t find "$type"',
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.w700,
+                color: Colors.white.withAlpha(204),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Go online to search again.',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.white.withAlpha(153),
+            const SizedBox(height: 8),
+            Text(
+              'Go online to search again.',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.white.withAlpha(153),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildErrorState() {
-    return SizedBox(
-      width: double.infinity,
-      height: double.infinity,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Something went wrong',
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.w700,
-              color: Colors.white.withAlpha(204),
+    return Expanded(
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Something went wrong',
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.w700,
+                color: Colors.white.withAlpha(204),
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            controller.error.value ?? 'Please try again.',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.white.withAlpha(153),
+            const SizedBox(height: 8),
+            Text(
+              controller.error.value ?? 'Please try again.',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.white.withAlpha(153),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

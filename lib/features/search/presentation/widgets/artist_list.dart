@@ -9,21 +9,22 @@ class ArtistList extends GetView<spotify.SearchController> {
 
   @override
   Widget build(BuildContext context) {
-    final showArtists = controller.isArtistSelected.value &&
-        controller.artistsResponse.value?.items.isNotEmpty == true;
+    return Obx(() {
+      final showArtists = controller.isArtistSelected.value &&
+          controller.artistsResponse.value?.items.isNotEmpty == true;
 
-    if (!showArtists) {
-      return const SizedBox.shrink();
-    }
-
-    return Expanded(
-      child: ListView.builder(
-        itemCount: controller.artistsResponse.value?.items.length ?? 0,
-        itemBuilder: (context, index) {
-          final artist = controller.artistsResponse.value!.items[index];
-          return ArtistItem(artist: artist);
-        },
-      ),
-    );
+      if (!showArtists) {
+        return const SizedBox.shrink();
+      }
+      return Expanded(
+        child: ListView.builder(
+          itemCount: controller.artistsResponse.value?.items.length ?? 0,
+          itemBuilder: (context, index) {
+            final artist = controller.artistsResponse.value!.items[index];
+            return ArtistItem(artist: artist);
+          },
+        ),
+      );
+    });
   }
-} 
+}

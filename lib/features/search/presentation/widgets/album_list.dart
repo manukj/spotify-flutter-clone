@@ -9,27 +9,28 @@ class AlbumList extends GetView<spotify.SearchController> {
 
   @override
   Widget build(BuildContext context) {
-    final showAlbums = controller.isAlbumSelected.value &&
-        controller.albumsResponse.value?.items.isNotEmpty == true;
+    return Obx(() {
+      final showAlbums = controller.isAlbumSelected.value &&
+          controller.albumsResponse.value?.items.isNotEmpty == true;
 
-    if (!showAlbums) {
-      return const SizedBox.shrink();
-    }
-
-    return Expanded(
-      child: GridView.builder(
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.8,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
+      if (!showAlbums) {
+        return const SizedBox.shrink();
+      }
+      return Expanded(
+        child: GridView.builder(
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            childAspectRatio: 0.8,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+          ),
+          itemCount: controller.albumsResponse.value?.items.length ?? 0,
+          itemBuilder: (context, index) {
+            final album = controller.albumsResponse.value!.items[index];
+            return AlbumItem(album: album);
+          },
         ),
-        itemCount: controller.albumsResponse.value?.items.length ?? 0,
-        itemBuilder: (context, index) {
-          final album = controller.albumsResponse.value!.items[index];
-          return AlbumItem(album: album);
-        },
-      ),
-    );
+      );
+    });
   }
 }
