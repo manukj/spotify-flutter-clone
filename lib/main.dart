@@ -1,11 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import 'core/config/env_config.dart';
 import 'core/di/injection_container.dart';
 import 'core/theme/app_theme.dart';
 import 'features/search/presentation/pages/home_page.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await EnvConfig.load();
+
+  if (!EnvConfig.isValid) {
+    throw Exception(
+        'Environment variables are not properly configured. Please check your .env file.');
+  }
+
   runApp(const MyApp());
 }
 
