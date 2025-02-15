@@ -24,4 +24,28 @@ class Artist {
     required this.genres,
     required this.images,
   });
+
+  Artist copyWith({
+    String? id,
+    String? name,
+    ExternalUrls? externalUrls,
+    String? href,
+    String? uri,
+    int? popularity,
+    Followers? followers,
+    List<String>? genres,
+    List<Image>? images,
+  }) {
+    return Artist(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      externalUrls: externalUrls ?? this.externalUrls,
+      href: href ?? this.href,
+      uri: uri ?? this.uri,
+      popularity: popularity ?? this.popularity,
+      followers: followers ?? this.followers,
+      genres: genres ?? this.genres,
+      images: images ?? this.images,
+    );
+  }
 } 
