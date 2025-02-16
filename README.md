@@ -55,31 +55,27 @@ The app uses GetX for state management and dependency injection:
 ## Key Features
 
 ### 1. Dependency Injection
+
 - GetX-based dependency injection
 - Centralized setup in `DependencyInjection` class
 - Easy testing with dependency mocking
 
 ### 2. Network Layer
+
 - Dio for HTTP requests
 - Custom interceptors for authentication and error handling
 - Spotify API integration
 - Proper error handling and retry mechanisms
 
 ### 3. Error Handling
+
 - Custom exceptions for different error scenarios
 - Centralized error handling in interceptors
 - User-friendly error messages
 - Proper error state management
 
-### 4. UI Components
-- Modern, responsive design
-- Sliver-based scrolling implementation
-- Grid view for albums
-- List view for artists
-- Custom search bar and filter chips
-- Proper loading and error states
-
 ### 5. Testing
+
 - Comprehensive widget tests
 - Mocking with mocktail
 - Controller testing
@@ -88,18 +84,30 @@ The app uses GetX for state management and dependency injection:
 ## Getting Started
 
 ### Prerequisites
+
+- Flutter SDK (^3.6.1)
+- Dart SDK (^3.6.1)
+- A Spotify Developer Account
+
+## Getting Started
+
+### Prerequisites
+
 - Flutter SDK (^3.6.1)
 - Dart SDK (^3.6.1)
 - A Spotify Developer Account
 - Make (for running Makefile commands)
 
 ### Setup
+
 1. Clone the repository
+
    ```bash
    git clone https://github.com/yourusername/spotify_flutter.git
    ```
 
 2. Setup the project (clean, get dependencies, and generate code)
+
    ```bash
    make setup
    ```
@@ -125,10 +133,6 @@ make coverage        # Generate and view coverage report
 # Code Generation
 make build_runner    # Run build_runner once
 make watch_runner    # Run build_runner in watch mode
-
-# Formatting and Linting
-make format          # Format code and apply fixes
-make lint            # Run flutter analyze
 
 # Cleaning
 make clean           # Clean project artifacts
@@ -156,25 +160,3 @@ make help           # Show all available commands
 - `json_serializable`: ^6.9.4 - JSON serialization
 - `mocktail`: ^1.0.4 - Mocking for tests
 - `flutter_lints`: ^5.0.0 - Linting
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Format and lint your code:
-   ```bash
-   make format
-   make lint
-   ```
-4. Run tests:
-   ```bash
-   make test
-   make coverage
-   ```
-5. Commit your changes (`git commit -m 'Add some amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
