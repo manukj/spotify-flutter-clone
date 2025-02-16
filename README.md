@@ -91,6 +91,7 @@ The app uses GetX for state management and dependency injection:
 - Flutter SDK (^3.6.1)
 - Dart SDK (^3.6.1)
 - A Spotify Developer Account
+- Make (for running Makefile commands)
 
 ### Setup
 1. Clone the repository
@@ -98,9 +99,9 @@ The app uses GetX for state management and dependency injection:
    git clone https://github.com/yourusername/spotify_flutter.git
    ```
 
-2. Install dependencies
+2. Setup the project (clean, get dependencies, and generate code)
    ```bash
-   flutter pub get
+   make setup
    ```
 
 3. Create a `.env` file in the root directory with your Spotify credentials:
@@ -109,21 +110,35 @@ The app uses GetX for state management and dependency injection:
    SPOTIFY_CLIENT_SECRET=your_client_secret
    ```
 
-4. Run the app
-   ```bash
-   flutter run
-   ```
+### Available Make Commands
 
-### Running Tests
 ```bash
-# Run all tests
-flutter test
+# Development
+make run-dev          # Run app in development mode
+make run-prod         # Run app in production mode
 
-# Run tests with coverage
-flutter test --coverage
+# Testing
+make test            # Run all tests
+make test-watch      # Run tests in watch mode
+make coverage        # Generate and view coverage report
 
-# Generate coverage report
-genhtml coverage/lcov.info -o coverage/html
+# Code Generation
+make build_runner    # Run build_runner once
+make watch_runner    # Run build_runner in watch mode
+
+# Formatting and Linting
+make format          # Format code and apply fixes
+make lint            # Run flutter analyze
+
+# Cleaning
+make clean           # Clean project artifacts
+
+# Building
+make build-apk       # Build Android APK
+make build-ios       # Build iOS app
+
+# Help
+make help           # Show all available commands
 ```
 
 ## Dependencies
@@ -146,9 +161,19 @@ genhtml coverage/lcov.info -o coverage/html
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+3. Format and lint your code:
+   ```bash
+   make format
+   make lint
+   ```
+4. Run tests:
+   ```bash
+   make test
+   make coverage
+   ```
+5. Commit your changes (`git commit -m 'Add some amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
 
 ## License
 
