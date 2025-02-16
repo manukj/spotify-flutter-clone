@@ -54,28 +54,27 @@ class HomePage extends GetView<spotify.SearchController> {
             ],
             body: CustomScrollView(
               slivers: [
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  sliver: SliverToBoxAdapter(
-                    child: Column(
-                      children: const [
-                        SpotifyFilterChips(),
-                      ],
-                    ),
+                // Filter chips as a non-scrollable box.
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: const SpotifyFilterChips(),
                   ),
                 ),
-                SliverFillRemaining(
-                  hasScrollBody: true,
+                // Info and Loader widget
+                SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(
-                      children: const [
-                        InfoAndLoader(),
-                        AlbumList(),
-                        ArtistList(),
-                      ],
-                    ),
+                    child: const InfoAndLoader(),
                   ),
+                ),
+                // Albums Grid
+                const AlbumList(),
+                // Artists List
+                const ArtistList(),
+                // Add extra spacing at the bottom if needed.
+                SliverToBoxAdapter(
+                  child: SizedBox(height: 100),
                 ),
               ],
             ),

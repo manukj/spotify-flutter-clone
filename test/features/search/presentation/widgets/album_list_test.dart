@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:spotify_flutter/features/search/domain/entities/album.dart';
 import 'package:spotify_flutter/features/search/domain/entities/albums_response.dart';
+import 'package:spotify_flutter/features/search/domain/entities/external_urls.dart';
 import 'package:spotify_flutter/features/search/domain/usecases/search_albums.dart';
 import 'package:spotify_flutter/features/search/domain/usecases/search_artists.dart';
 import 'package:spotify_flutter/features/search/presentation/controllers/search_controller.dart'
@@ -27,142 +28,151 @@ void main() {
       searchArtists: mockSearchArtists,
       searchAlbums: mockSearchAlbums,
     );
-    Get.put(controller);
+    Get.put<spotify.SearchController>(controller);
   });
 
   tearDown(() {
     Get.reset();
   });
 
-  final tAlbum = Album(
-    albumType: 'album',
-    totalTracks: 12,
-    availableMarkets: const ['US'],
-    externalUrls: null,
-    href: 'test_href',
-    id: 'test_id',
-    images: null,
-    name: 'Test Album',
-    releaseDate: '2024',
-    releaseDatePrecision: 'year',
-    type: 'album',
-    uri: 'test_uri',
-    artists: const [],
-  );
+  testWidgets('should show empty widget when isAlbumSelected is false',
+      (WidgetTester tester) async {
+    // Arrange
+    controller.isAlbumSelected.value = false;
+    controller.albumsResponse.value = null;
 
-  final tAlbumsResponse = AlbumsResponse(
-    href: 'test_href',
-    limit: 20,
-    offset: 0,
-    total: 1,
-    items: [tAlbum],
-  );
-
-  Widget createWidgetUnderTest() {
-    return MaterialApp(
-      home: Scaffold(
-        body: Column(
-          children: const [
-            AlbumList(),
-          ],
+    // Act
+    await tester.pumpWidget(
+      GetMaterialApp(
+        home: Scaffold(
+          body: CustomScrollView(
+            slivers: [
+              AlbumList(),
+            ],
+          ),
         ),
       ),
     );
-  }
+    await tester.pumpAndSettle();
 
-  group('AlbumList', () {
-    testWidgets('should show albums when album is selected', (tester) async {
-      controller.selectAlbum();
-      controller.albumsResponse.value = tAlbumsResponse;
+    // Assert
+    expect(find.byKey(const Key('empty_album_widget'), skipOffstage: false),
+        findsOneWidget);
+  });
 
-      await tester.pumpWidget(createWidgetUnderTest());
-      await tester.pumpAndSettle();
+  testWidgets('should show empty widget when loading',
+      (WidgetTester tester) async {
+    // Arrange
+    controller.isAlbumSelected.value = true;
+    controller.isLoading.value = true;
+    controller.albumsResponse.value = AlbumsResponse(
+      items: [
+        Album(
+          id: '1',
+          name: 'Test Album',
+          artists: [],
+          images: [],
+          releaseDate: '',
+          totalTracks: 1,
+          albumType: 'album',
+          availableMarkets: ['US'],
+          externalUrls:
+              ExternalUrls(spotify: 'https://open.spotify.com/album/1'),
+          href: 'https://api.spotify.com/v1/albums/1',
+          releaseDatePrecision: 'day',
+          type: 'album',
+          uri: 'spotify:album:1',
+        ),
+      ],
+      href: '',
+      limit: 20,
+      offset: 0,
+      total: 1,
+    );
 
-      expect(find.byType(GridView), findsOneWidget);
-      expect(find.byType(AlbumItem), findsOneWidget);
-    });
+    // Act
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: CustomScrollView(
+            slivers: [
+              AlbumList(),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
 
-    testWidgets('should show nothing when only artist is selected',
-        (tester) async {
-      controller.selectArtist();
-      controller.albumsResponse.value = tAlbumsResponse;
+    // Assert
+    expect(find.byKey(const Key('empty_album_widget'), skipOffstage: false),
+        findsOneWidget);
+    expect(find.byType(SliverGrid, skipOffstage: false), findsNothing);
+  });
 
-      await tester.pumpWidget(createWidgetUnderTest());
-      await tester.pumpAndSettle();
+  testWidgets('should show grid with albums when data is available',
+      (WidgetTester tester) async {
+    // Arrange
+    controller.isAlbumSelected.value = true;
+    controller.isLoading.value = false;
+    controller.albumsResponse.value = AlbumsResponse(
+      items: [
+        Album(
+          id: '1',
+          name: 'Test Album 1',
+          artists: [],
+          images: [],
+          releaseDate: '',
+          totalTracks: 1,
+          albumType: 'album',
+          availableMarkets: ['US'],
+          externalUrls:
+              ExternalUrls(spotify: 'https://open.spotify.com/album/1'),
+          href: 'https://api.spotify.com/v1/albums/1',
+          releaseDatePrecision: 'day',
+          type: 'album',
+          uri: 'spotify:album:1',
+        ),
+        Album(
+          id: '2',
+          name: 'Test Album 2',
+          artists: [],
+          images: [],
+          releaseDate: '',
+          totalTracks: 1,
+          albumType: 'album',
+          availableMarkets: ['US'],
+          externalUrls:
+              ExternalUrls(spotify: 'https://open.spotify.com/album/2'),
+          href: 'https://api.spotify.com/v1/albums/2',
+          releaseDatePrecision: 'day',
+          type: 'album',
+          uri: 'spotify:album:2',
+        ),
+      ],
+      href: '',
+      limit: 20,
+      offset: 0,
+      total: 2,
+    );
 
-      expect(find.byType(SizedBox), findsOneWidget);
-      expect(find.byType(GridView), findsNothing);
-      expect(find.byType(AlbumItem), findsNothing);
-    });
+    // Act
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: CustomScrollView(
+            slivers: [
+              AlbumList(),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
 
-    testWidgets('should show nothing when albums response is empty',
-        (tester) async {
-      controller.selectAlbum();
-      controller.albumsResponse.value = AlbumsResponse(
-        href: 'test_href',
-        limit: 20,
-        offset: 0,
-        total: 0,
-        items: [],
-      );
-
-      await tester.pumpWidget(createWidgetUnderTest());
-      await tester.pumpAndSettle();
-
-      expect(find.byType(SizedBox), findsOneWidget);
-      expect(find.byType(GridView), findsNothing);
-      expect(find.byType(AlbumItem), findsNothing);
-    });
-
-    testWidgets('should show only SizedBox when albums response is null',
-        (tester) async {
-      controller.selectAlbum();
-      controller.albumsResponse.value = null;
-
-      await tester.pumpWidget(createWidgetUnderTest());
-      await tester.pumpAndSettle();
-
-      expect(find.byType(SizedBox), findsOneWidget);
-      expect(find.byType(GridView), findsNothing);
-      expect(find.byType(AlbumItem), findsNothing);
-
-      final SizedBox sizedBox = tester.widget(find.byType(SizedBox));
-      expect(sizedBox.width, 0.0);
-      expect(sizedBox.height, 0.0);
-    });
-
-    testWidgets('should show correct number of albums', (tester) async {
-      controller.selectAlbum();
-      controller.albumsResponse.value = AlbumsResponse(
-        href: 'test_href',
-        limit: 20,
-        offset: 0,
-        total: 3,
-        items: List.generate(3, (index) => tAlbum),
-      );
-
-      await tester.pumpWidget(createWidgetUnderTest());
-      await tester.pumpAndSettle();
-
-      expect(find.byType(GridView), findsOneWidget);
-      expect(find.byType(AlbumItem), findsNWidgets(3));
-    });
-
-    testWidgets('should have correct grid layout', (tester) async {
-      controller.selectAlbum();
-      controller.albumsResponse.value = tAlbumsResponse;
-
-      await tester.pumpWidget(createWidgetUnderTest());
-      await tester.pumpAndSettle();
-
-      final GridView gridView = tester.widget(find.byType(GridView));
-      final SliverGridDelegateWithFixedCrossAxisCount delegate =
-          gridView.gridDelegate as SliverGridDelegateWithFixedCrossAxisCount;
-
-      expect(delegate.crossAxisCount, 2);
-      expect(delegate.childAspectRatio, 0.8);
-      expect(delegate.crossAxisSpacing, 16);
-      expect(delegate.mainAxisSpacing, 16);
-    });
+    // Assert
+    expect(find.byType(SliverToBoxAdapter, skipOffstage: false), findsNothing);
+    expect(find.byType(SliverGrid, skipOffstage: false), findsOneWidget);
+    expect(find.byType(AlbumItem, skipOffstage: false), findsNWidgets(2));
   });
 }

@@ -15,15 +15,18 @@ class ArtistList extends GetView<spotify.SearchController> {
           !controller.isLoading.value;
 
       if (!showArtists) {
-        return const SizedBox.shrink();
+        return const SliverToBoxAdapter(
+          key: Key('empty_artist_widget'),
+          child: SizedBox.shrink(),
+        );
       }
-      return Expanded(
-        child: ListView.builder(
-          itemCount: controller.artistsResponse.value?.items.length ?? 0,
-          itemBuilder: (context, index) {
+      return SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
             final artist = controller.artistsResponse.value!.items[index];
             return ArtistItem(artist: artist);
           },
+          childCount: controller.artistsResponse.value?.items.length ?? 0,
         ),
       );
     });

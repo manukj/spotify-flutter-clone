@@ -10,7 +10,9 @@ class InfoAndLoader extends GetView<spotify.SearchController> {
   Widget build(BuildContext context) {
     return Obx(() {
       if (controller.isLoading.value) {
-        return Expanded(
+        return SizedBox(
+          height: MediaQuery.of(context).size.height *
+              0.4, // Adjust height as needed
           child: const Center(
             child: CircularProgressIndicator(),
           ),
@@ -18,112 +20,109 @@ class InfoAndLoader extends GetView<spotify.SearchController> {
       }
 
       if (controller.error.value != null) {
-        return _buildErrorState();
+        return _buildErrorState(context);
       }
 
       if (controller.query.value.isEmpty) {
-        return _buildEmptySearchState();
+        return _buildEmptySearchState(context);
       }
 
       if (controller.isArtistSelected.value &&
           controller.artistsResponse.value?.items.isEmpty == true) {
-        return _buildNoResultsState('Artists');
+        return _buildNoResultsState(context, 'Artists');
       }
 
       if (controller.isAlbumSelected.value &&
           controller.albumsResponse.value?.items.isEmpty == true) {
-        return _buildNoResultsState('Albums');
+        return _buildNoResultsState(context, 'Albums');
       }
 
-      return const SizedBox(width: 0, height: 0);
+      return const SizedBox.shrink();
     });
   }
 
-  Widget _buildEmptySearchState() {
+  Widget _buildEmptySearchState(BuildContext context) {
     final searchType = controller.isArtistSelected.value ? 'Artists' : 'Albums';
-    return Expanded(
-      child: SizedBox(
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Search',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w700,
-                color: Colors.white.withAlpha(204),
-              ),
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.4,
+      width: double.infinity,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Search',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w700,
+              color: Colors.white.withAlpha(204),
             ),
-            const SizedBox(height: 8),
-            Text(
-              searchType,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white.withAlpha(153),
-              ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            searchType,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white.withAlpha(153),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildNoResultsState(String type) {
-    return Expanded(
-      child: SizedBox(
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Couldn\'t find "$type"',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w700,
-                color: Colors.white.withAlpha(204),
-              ),
+  Widget _buildNoResultsState(BuildContext context, String type) {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.4,
+      width: double.infinity,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Couldn\'t find "$type"',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w700,
+              color: Colors.white.withAlpha(204),
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Go online to search again.',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white.withAlpha(153),
-              ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Go online to search again.',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white.withAlpha(153),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildErrorState() {
-    return Expanded(
-      child: SizedBox(
-        width: double.infinity,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Something went wrong',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w700,
-                color: Colors.white.withAlpha(204),
-              ),
+  Widget _buildErrorState(BuildContext context) {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.4,
+      width: double.infinity,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Something went wrong',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.w700,
+              color: Colors.white.withAlpha(204),
             ),
-            const SizedBox(height: 8),
-            Text(
-              controller.error.value ?? 'Please try again.',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.white.withAlpha(153),
-              ),
-              textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            controller.error.value ?? 'Please try again.',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white.withAlpha(153),
             ),
-          ],
-        ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }

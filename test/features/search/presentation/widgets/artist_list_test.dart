@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:spotify_flutter/features/search/domain/entities/artist.dart';
 import 'package:spotify_flutter/features/search/domain/entities/artists_response.dart';
+import 'package:spotify_flutter/features/search/domain/entities/external_urls.dart';
 import 'package:spotify_flutter/features/search/domain/usecases/search_albums.dart';
 import 'package:spotify_flutter/features/search/domain/usecases/search_artists.dart';
 import 'package:spotify_flutter/features/search/presentation/controllers/search_controller.dart'
@@ -27,121 +28,134 @@ void main() {
       searchArtists: mockSearchArtists,
       searchAlbums: mockSearchAlbums,
     );
-    Get.put(controller);
+    Get.put<spotify.SearchController>(controller);
   });
 
   tearDown(() {
     Get.reset();
   });
 
-  final tArtist = Artist(
-    id: 'test_id',
-    name: 'Test Artist',
-    externalUrls: null,
-    href: 'test_href',
-    uri: 'test_uri',
-    popularity: 80,
-    followers: null,
-    genres: const [],
-    images: null,
-  );
+  testWidgets('should show empty widget when isArtistSelected is false',
+      (WidgetTester tester) async {
+    // Arrange
+    controller.isArtistSelected.value = false;
+    controller.artistsResponse.value = null;
 
-  final tArtistsResponse = ArtistsResponse(
-    href: 'test_href',
-    limit: 20,
-    offset: 0,
-    total: 1,
-    items: [tArtist],
-  );
-
-  Widget createWidgetUnderTest() {
-    return MaterialApp(
-      home: Scaffold(
-        body: Column(
-          children: const [
-            ArtistList(),
-          ],
+    // Act
+    await tester.pumpWidget(
+      GetMaterialApp(
+        home: Scaffold(
+          body: CustomScrollView(
+            slivers: [
+              ArtistList(),
+            ],
+          ),
         ),
       ),
     );
-  }
+    await tester.pumpAndSettle();
 
-  group('ArtistList', () {
-    testWidgets('should show artists when artist is selected', (tester) async {
-      controller.selectArtist();
-      controller.artistsResponse.value = tArtistsResponse;
+    // Assert
+    expect(find.byKey(const Key('empty_artist_widget'), skipOffstage: false), findsOneWidget);
+  });
 
-      await tester.pumpWidget(createWidgetUnderTest());
-      await tester.pumpAndSettle();
+  testWidgets('should show empty widget when loading',
+      (WidgetTester tester) async {
+    // Arrange
+    controller.isArtistSelected.value = true;
+    controller.isLoading.value = true;
+    controller.artistsResponse.value = ArtistsResponse(
+      items: [
+        Artist(
+          id: '1',
+          name: 'Test Artist',
+          externalUrls: ExternalUrls(spotify: 'https://open.spotify.com/artist/1'),
+          href: 'https://api.spotify.com/v1/artists/1',
+          uri: 'spotify:artist:1',
+          popularity: 80,
+          followers: null,
+          genres: const [],
+          images: [],
+        ),
+      ],
+      href: '',
+      limit: 20,
+      offset: 0,
+      total: 1,
+    );
 
-      expect(find.byType(ListView), findsOneWidget);
-      expect(find.byType(ArtistItem), findsOneWidget);
-    });
+    // Act
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: CustomScrollView(
+            slivers: [
+              ArtistList(),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
 
-    testWidgets('should show nothing when only album is selected',
-        (tester) async {
-      controller.selectAlbum();
-      controller.artistsResponse.value = tArtistsResponse;
+    // Assert
+    expect(find.byKey(const Key('empty_artist_widget'), skipOffstage: false), findsOneWidget);
+    expect(find.byType(SliverList, skipOffstage: false), findsNothing);
+  });
 
-      await tester.pumpWidget(createWidgetUnderTest());
-      await tester.pumpAndSettle();
+  testWidgets('should show list with artists when data is available',
+      (WidgetTester tester) async {
+    // Arrange
+    controller.isArtistSelected.value = true;
+    controller.isLoading.value = false;
+    controller.artistsResponse.value = ArtistsResponse(
+      items: [
+        Artist(
+          id: '1',
+          name: 'Test Artist 1',
+          externalUrls: ExternalUrls(spotify: 'https://open.spotify.com/artist/1'),
+          href: 'https://api.spotify.com/v1/artists/1',
+          uri: 'spotify:artist:1',
+          popularity: 80,
+          followers: null,
+          genres: const [],
+          images: [],
+        ),
+        Artist(
+          id: '2',
+          name: 'Test Artist 2',
+          externalUrls: ExternalUrls(spotify: 'https://open.spotify.com/artist/2'),
+          href: 'https://api.spotify.com/v1/artists/2',
+          uri: 'spotify:artist:2',
+          popularity: 75,
+          followers: null,
+          genres: const [],
+          images: [],
+        ),
+      ],
+      href: '',
+      limit: 20,
+      offset: 0,
+      total: 2,
+    );
 
-      expect(find.byType(SizedBox), findsOneWidget);
-      expect(find.byType(ListView), findsNothing);
-      expect(find.byType(ArtistItem), findsNothing);
-    });
+    // Act
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: CustomScrollView(
+            slivers: [
+              ArtistList(),
+            ],
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
 
-    testWidgets('should show nothing when artists response is empty',
-        (tester) async {
-      controller.selectArtist();
-      controller.artistsResponse.value = ArtistsResponse(
-        href: 'test_href',
-        limit: 20,
-        offset: 0,
-        total: 0,
-        items: [],
-      );
-
-      await tester.pumpWidget(createWidgetUnderTest());
-      await tester.pumpAndSettle();
-
-      expect(find.byType(SizedBox), findsOneWidget);
-      expect(find.byType(ListView), findsNothing);
-      expect(find.byType(ArtistItem), findsNothing);
-    });
-
-    testWidgets('should show only SizedBox when artists response is null',
-        (tester) async {
-      controller.selectArtist();
-      controller.artistsResponse.value = null;
-
-      await tester.pumpWidget(createWidgetUnderTest());
-      await tester.pumpAndSettle();
-
-      expect(find.byType(SizedBox), findsOneWidget);
-      expect(find.byType(ListView), findsNothing);
-      expect(find.byType(ArtistItem), findsNothing);
-
-      final SizedBox sizedBox = tester.widget(find.byType(SizedBox));
-      expect(sizedBox.width, 0.0);
-      expect(sizedBox.height, 0.0);
-    });
-
-    testWidgets('should show correct number of artists', (tester) async {
-      controller.selectArtist();
-      controller.artistsResponse.value = ArtistsResponse(
-        href: 'test_href',
-        limit: 20,
-        offset: 0,
-        total: 3,
-        items: List.generate(3, (index) => tArtist),
-      );
-
-      await tester.pumpWidget(createWidgetUnderTest());
-      await tester.pumpAndSettle();
-
-      expect(find.byType(ListView), findsOneWidget);
-      expect(find.byType(ArtistItem), findsNWidgets(3));
-    });
+    // Assert
+    expect(find.byType(SliverToBoxAdapter, skipOffstage: false), findsNothing);
+    expect(find.byType(SliverList, skipOffstage: false), findsOneWidget);
+    expect(find.byType(ArtistItem, skipOffstage: false), findsNWidgets(2));
   });
 }

@@ -15,21 +15,25 @@ class AlbumList extends GetView<spotify.SearchController> {
           !controller.isLoading.value;
 
       if (!showAlbums) {
-        return const SizedBox.shrink();
+        return const SliverToBoxAdapter(
+          key: Key('empty_album_widget'),
+          child: SizedBox.shrink(),
+        );
       }
-      return Expanded(
-        child: GridView.builder(
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 0.8,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-          ),
-          itemCount: controller.albumsResponse.value?.items.length ?? 0,
-          itemBuilder: (context, index) {
+
+      return SliverGrid(
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          childAspectRatio: 0.8,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
+        ),
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
             final album = controller.albumsResponse.value!.items[index];
             return AlbumItem(album: album);
           },
+          childCount: controller.albumsResponse.value?.items.length ?? 0,
         ),
       );
     });
