@@ -19,7 +19,6 @@ class ArtistList extends GetView<spotify.SearchController> {
       }
       return Expanded(
         child: ListView.builder(
-          physics: const NeverScrollableScrollPhysics(),
           itemCount: controller.artistsResponse.value?.items.length ?? 0,
           itemBuilder: (context, index) {
             final artist = controller.artistsResponse.value!.items[index];
