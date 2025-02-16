@@ -65,8 +65,8 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest());
 
       expect(find.text('Search'), findsOneWidget);
-      expect(find.text('artists'), findsOneWidget);
-      expect(find.text('albums'), findsNothing);
+      expect(find.text('Artists'), findsOneWidget);
+      expect(find.text('Albums'), findsNothing);
       expect(find.byType(CircularProgressIndicator), findsNothing);
     });
 
@@ -76,23 +76,23 @@ void main() {
       await tester.pumpWidget(createWidgetUnderTest());
 
       expect(find.text('Search'), findsOneWidget);
-      expect(find.text('albums'), findsOneWidget);
-      expect(find.text('artists'), findsNothing);
+      expect(find.text('Albums'), findsOneWidget);
+      expect(find.text('Artists'), findsNothing);
       expect(find.byType(CircularProgressIndicator), findsNothing);
     });
 
     testWidgets('should update empty search state when selection changes',
         (tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
-      expect(find.text('artists'), findsOneWidget);
+      expect(find.text('Artists'), findsOneWidget);
 
       controller.selectAlbum();
       await tester.pump();
-      expect(find.text('albums'), findsOneWidget);
+      expect(find.text('Albums'), findsOneWidget);
 
       controller.selectArtist();
       await tester.pump();
-      expect(find.text('artists'), findsOneWidget);
+      expect(find.text('Artists'), findsOneWidget);
     });
   });
 
@@ -110,7 +110,7 @@ void main() {
 
       await tester.pumpWidget(createWidgetUnderTest());
 
-      expect(find.text('Couldn\'t find "artists"'), findsOneWidget);
+      expect(find.text('Couldn\'t find "Artists"'), findsOneWidget);
       expect(find.text('Go online to search again.'), findsOneWidget);
       expect(find.text('Search'), findsNothing);
       expect(find.byType(CircularProgressIndicator), findsNothing);
@@ -130,7 +130,7 @@ void main() {
 
       await tester.pumpWidget(createWidgetUnderTest());
 
-      expect(find.text('Couldn\'t find "albums"'), findsOneWidget);
+      expect(find.text('Couldn\'t find "Albums"'), findsOneWidget);
       expect(find.text('Go online to search again.'), findsOneWidget);
       expect(find.text('Search'), findsNothing);
       expect(find.byType(CircularProgressIndicator), findsNothing);

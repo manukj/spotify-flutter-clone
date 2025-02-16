@@ -27,12 +27,12 @@ class InfoAndLoader extends GetView<spotify.SearchController> {
 
       if (controller.isArtistSelected.value &&
           controller.artistsResponse.value?.items.isEmpty == true) {
-        return _buildNoResultsState('artists');
+        return _buildNoResultsState('Artists');
       }
 
       if (controller.isAlbumSelected.value &&
           controller.albumsResponse.value?.items.isEmpty == true) {
-        return _buildNoResultsState('albums');
+        return _buildNoResultsState('Albums');
       }
 
       return const SizedBox(width: 0, height: 0);
@@ -120,6 +120,7 @@ class InfoAndLoader extends GetView<spotify.SearchController> {
                 fontSize: 16,
                 color: Colors.white.withAlpha(153),
               ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),

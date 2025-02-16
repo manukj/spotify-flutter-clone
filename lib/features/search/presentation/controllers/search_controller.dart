@@ -1,6 +1,8 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../../core/error/exceptions.dart';
 import '../../../../core/utils/debouncer.dart';
 import '../../domain/entities/albums_response.dart';
 import '../../domain/entities/artists_response.dart';
@@ -56,7 +58,12 @@ class SearchController extends GetxController {
         albumsResponse.value = await searchAlbums(searchQuery);
       }
     } catch (e) {
-      error.value = e.toString();
+      if (e is DioException && e.error is SpotifyException) {
+        error.value = (e.error as SpotifyException).message;
+      } else {
+        error.value = e.toString();
+      }
+      
       if (isArtistSelected.value) {
         artistsResponse.value = null;
       } else if (isAlbumSelected.value) {

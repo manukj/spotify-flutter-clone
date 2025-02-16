@@ -1,5 +1,7 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:spotify_flutter/core/error/exceptions.dart';
 import 'package:spotify_flutter/features/search/domain/entities/albums_response.dart';
 import 'package:spotify_flutter/features/search/domain/entities/artists_response.dart';
 import 'package:spotify_flutter/features/search/domain/usecases/search_albums.dart';
@@ -207,6 +209,59 @@ void main() {
       await Future.delayed(const Duration(milliseconds: 350));
 
       verifyNever(() => mockSearchArtists(any()));
+    });
+  });
+
+  group('error handling', () {
+    test('should handle SpotifyException correctly for artist search', () async {
+      final spotifyError = SpotifyException(
+        message: 'Invalid token',
+        statusCode: 401,
+      );
+      final dioError = DioException(
+        requestOptions: RequestOptions(path: ''),
+        error: spotifyError,
+      );
+      
+      when(() => mockSearchArtists(any())).thenThrow(dioError);
+
+      controller.onSearchQueryChanged(tQuery);
+      await Future.delayed(const Duration(milliseconds: 600));
+
+      expect(controller.error.value, spotifyError.message);
+      expect(controller.artistsResponse.value, null);
+    });
+
+    test('should handle SpotifyException correctly for album search', () async {
+      controller.selectAlbum();
+      
+      final spotifyError = SpotifyException(
+        message: 'Rate limit exceeded',
+        statusCode: 429,
+      );
+      final dioError = DioException(
+        requestOptions: RequestOptions(path: ''),
+        error: spotifyError,
+      );
+      
+      when(() => mockSearchAlbums(any())).thenThrow(dioError);
+
+      controller.onSearchQueryChanged(tQuery);
+      await Future.delayed(const Duration(milliseconds: 600));
+
+      expect(controller.error.value, spotifyError.message);
+      expect(controller.albumsResponse.value, null);
+    });
+
+    test('should handle generic error correctly', () async {
+      final error = Exception('Generic error');
+      when(() => mockSearchArtists(any())).thenThrow(error);
+
+      controller.onSearchQueryChanged(tQuery);
+      await Future.delayed(const Duration(milliseconds: 600));
+
+      expect(controller.error.value, error.toString());
+      expect(controller.artistsResponse.value, null);
     });
   });
 } 
